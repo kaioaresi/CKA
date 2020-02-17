@@ -126,6 +126,26 @@ kubeadm join haproxy-master-1:6443 --token 0r7h3h.evqy8tbhcm5mmwt6 \
   --control-plane --certificate-key 53fd8e4c83ef27212a9646b1eb5ce473ce710ab2641cab29eed7708bac26a5f0
 ```
 
+## joint workers
+
+On any master
+
+```
+kubeadm token create --print-join-command
+```
+
+On workers
+
+```
+vim /etc/hosts
+
+<ip do haproxy> <hostname haproxy>
+```
+
+```
+kubeadm join haproxy-master-1:6443 --token fjqjsg.xhptxm5xe3c13ljm     --discovery-token-ca-cert-hash sha256:ce5a96e0186c12eaef811b4f803ded69a9fcaf4114ab91ca86a439b1996793a5
+```
+
 ---
 
 # Referencias
