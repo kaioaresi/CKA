@@ -93,8 +93,6 @@ The Certification focuses on the skills required to be a successful Kubernetes A
 
 ---
 
-18/02
-
 # 1 - Core Concepts
 
 ## Understand the Kubernetes cluster architecture.
@@ -148,6 +146,8 @@ Load balances traffic between application components.
 **[Container runtime](https://kubernetes.io/docs/concepts/overview/components/#container-runtime)** The container runtime is the software that is responsible for running containers.
 
 Kubernetes supports several container runtimes: Docker, containerd, CRI-O, and any implementation of the Kubernetes CRI (Container Runtime Interface).
+
+![Alt container runtime](img/application_runtime.jpg)
 
 ## Understand the Kubernetes API primitives.
 
