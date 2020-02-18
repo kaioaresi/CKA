@@ -97,7 +97,7 @@ The Certification focuses on the skills required to be a successful Kubernetes A
 
 # 1 - Core Concepts
 
-## Cluster architecture
+## Understand the Kubernetes cluster architecture.
 
 ### Control Plane Components
 
@@ -150,8 +150,6 @@ Load balances traffic between application components.
 Kubernetes supports several container runtimes: Docker, containerd, CRI-O, and any implementation of the Kubernetes CRI (Container Runtime Interface).
 
 ## Understand the Kubernetes API primitives.
-
-## Understand the Kubernetes cluster architecture.
 
 ## Understand Services and other network primitives.
 
