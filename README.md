@@ -91,6 +91,69 @@ The Certification focuses on the skills required to be a successful Kubernetes A
 - [Certification and Confidentiality Agreement](https://training.linuxfoundation.org/wp-content/uploads/2020/01/Certification-and-Confidentiality-Agreement-CNCF-v1.3-1.pdf)
 - [Verify Certification](https://training.linuxfoundation.org/certification/verify/)
 
+---
+
+18/02
+
+# 1 - Core Concepts
+
+## Cluster architecture
+
+### Control Plane Components
+
+![Alt architecture k8s](img/arch_k8s.jpg)
+
+**[kube Api Server](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/)** The Kubernetes API server validates and configures data for the api objects which include pods, services, replicationcontrollers, and others. The API Server services REST operations and provides the frontend to the cluster’s shared state through which all other components interact.
+
+The communication hub for all cluster components. It exposes the kubernetes API.
+
+```
+kube-apiserver [flags]
+```
+
+**[kube Schedule](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/)** The Kubernetes scheduler is a policy-rich, topology-aware, workload-specific function that significantly impacts availability, performance, and capacity. The scheduler needs to take into account individual and collective resource requirements, quality of service requirements, hardware/software/policy constraints, affinity and anti-affinity specifications, data locality, inter-workload interference, deadlines, and so on. Workload-specific requirements will be exposed through the API as necessary.
+
+Assings your app to a worker node, auto-detects which pod to assign to which node based on resource requirements, hardware constraints, etc.
+
+```
+kube-scheduler [flags]
+```
+
+**[kube controller manager](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/)** The Kubernetes controller manager is a daemon that embeds the core control loops shipped with Kubernetes. In applications of robotics and automation, a control loop is a non-terminating loop that regulates the state of the system. In Kubernetes, a controller is a control loop that watches the shared state of the cluster through the apiserver and makes changes attempting to move the current state towards the desired state. Examples of controllers that ship with Kubernetes today are the replication controller, endpoints controller, namespace controller, and serviceaccounts controller.
+
+Maintains the cluster. handles node failure, replicating components, maintaning the correct amount of pods, etc.
+
+```
+kube-controller-manager [flags]
+```
+
+**[ETCD](https://etcd.io/docs/v3.4.0/)** Consistent and highly-available key value store used as Kubernetes’ backing store for all cluster data.
+
+If your Kubernetes cluster uses etcd as its backing store, make sure you have a back up plan for those data.
+
+Data store that stores the cluster configuration.
+
+### Node Components
+
+**[Kubelet](https://kubernetes.io/docs/concepts/overview/components/#kubelet)** Runs and manages the containers on the node and talks to the kube API server.
+
+**[kube-proxy](https://kubernetes.io/docs/concepts/overview/components/#kube-proxy)** kube-proxy is a network proxy that runs on each node in your cluster, implementing part of the Kubernetes Service concept.
+
+kube-proxy maintains network rules on nodes. These network rules allow network communication to your Pods from network sessions inside or outside of your cluster.
+
+kube-proxy uses the operating system packet filtering layer if there is one and it’s available. Otherwise, kube-proxy forwards the traffic itself.
+
+Load balances traffic between application components.
+
+**[Container runtime](https://kubernetes.io/docs/concepts/overview/components/#container-runtime)** The container runtime is the software that is responsible for running containers.
+
+Kubernetes supports several container runtimes: Docker, containerd, CRI-O, and any implementation of the Kubernetes CRI (Container Runtime Interface).
+
+## Understand the Kubernetes API primitives.
+
+## Understand the Kubernetes cluster architecture.
+
+## Understand Services and other network primitives.
 
 ---
 # References
