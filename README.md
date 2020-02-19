@@ -160,6 +160,9 @@ kubectl get componentstatuses
 
 Every component in the Kubernetes system makes a request to the API server. The kubectl command line utility processes those API calls for us and allows us to format our request in a certain way. In this lesson, we will learn how Kubernetes accepts the instructions to run deployments and go through the YAML script that is used to tell the control plane what our environment should look like.
 
+![Alt api primitives](img/apis_primitives.jpg)
+
+
 **[apiVersion](https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/#required-fields)** Kubernetes API version, which indicates the path to ensure the api presents a clear, consistent view of system resources and behavior, follow the example below.
 
 ```
