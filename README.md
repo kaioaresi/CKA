@@ -149,7 +149,183 @@ Kubernetes supports several container runtimes: Docker, containerd, CRI-O, and a
 
 ![Alt container runtime](img/application_runtime.jpg)
 
+
+```
+kubectl get componentstatuses
+```
+
+---
+
 ## Understand the Kubernetes API primitives.
+
+Every component in the Kubernetes system makes a request to the API server. The kubectl command line utility processes those API calls for us and allows us to format our request in a certain way. In this lesson, we will learn how Kubernetes accepts the instructions to run deployments and go through the YAML script that is used to tell the control plane what our environment should look like.
+
+**[apiVersion](https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/#required-fields)** Kubernetes API version, which indicates the path to ensure the api presents a clear, consistent view of system resources and behavior, follow the example below.
+
+```
+apiVersion: apps/v1
+```
+
+**kind** Presents kind of objetc you want to create This is a REQUIRED field. Examples of kinds of objects include `Pod`,`Deployment`,`Dob`,`DaemonSets`,`ReplicaSet`, `Replicationcontrollers` and more, follow the example below.
+
+```
+apiVersion: apps/v1
+kind: Deployment
+```
+
+**metadata** Data that helps uniquely identify the objetc, including a `name` string `UID`, and optional namespace, for
+
+**Tips about [name](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/)**
+
+> Only one object of a given kind can have a given name at a time. However, if you delete the object, you can make a new object with the same name.
+
+> Kubernetes resources can have names up to **253 characters** long. The characters allowed in names are: `digits (0-9)`, `lower case letters (a-z)`, `-`, and `.`.
+
+```
+metadata:
+  name: nginx-deployment
+```
+
+There are other importants thinks to know, it is useful in the metadata, `Labels` and `Annotations`.
+
+**Labels**
+
+`Labels` are key/value pairs that are attached to objects, such as pods. `Labels` are intended to be used to specify identifying attributes of objects that are meaningful and relevant to users, but do not directly imply semantics to the core system. `Labels` can be used to organize and to select subsets of objects. `Labels` can be attached to objects at creation time and subsequently added and modified at any time. Each object can have a set of key/value labels defined. Each Key must be unique for a given object.
+
+```
+"metadata": {
+  "labels": {
+    "key1" : "value1",
+    "key2" : "value2"
+  }
+}
+```
+
+**Tips** Before you create any object you can use the `Selectors` to filter them, show the especific label, all or many labels, follow the exemples below.
+
+All
+
+```
+kubectl get <object> --show-labels
+
+kubectl get pods|pod --show-labels
+```
+
+All labels with `app`
+
+```
+kubectl get pods -L app
+```
+
+Specific label key and value
+
+```
+kubectl get pods -l app=nginx
+```
+
+**Annotations** You can use either labels or annotations to attach metadata to Kubernetes objects. Labels can be used to select objects and to find collections of objects that satisfy certain conditions. In contrast, annotations are not used to identify and select objects. The metadata in an annotation can be small or large, structured or unstructured, and can include characters not permitted by labels.
+
+Annotations, like labels, are key/value maps:
+
+```
+"metadata": {
+  "annotations": {
+    "key1" : "value1",
+    "key2" : "value2"
+  }
+}
+```
+
+Here are some examples of information that could be recorded in annotations:
+
+- Fields managed by a declarative configuration layer. Attaching these fields as annotations distinguishes them from default values set by clients or servers, and from auto-generated fields and fields set by auto-sizing or auto-scaling systems.
+- Build, release, or image information like timestamps, release IDs, git branch, PR numbers, image hashes, and registry address.
+- Pointers to logging, monitoring, analytics, or audit repositories.
+- Client library or tool information that can be used for debugging purposes: for example, name, version, and build information.
+- User or tool/system provenance information, such as URLs of related objects from other ecosystem components.
+- Lightweight rollout tool metadata: for example, config or checkpoints.
+- Phone or pager numbers of persons responsible, or directory entries that specify where that information can be found, such as a team web site.
+- Directives from the end-user to the implementations to modify behavior or engage non-standard features.
+
+
+**[DeploymentSpec v1 apps](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#deploymentspec-v1-apps)** Describe your desired state for the object and the characteristics you want the objetct to have. The format of the object spec is different for every object and contains nested fields specific to that object.
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+```
+
+**[Container Spec](https://kubernetes.io/docs/concepts/containers/container-environment-variables/)** Specifies the pod's container image, volumes, and exposed ports for the container.
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+```
+
+**[Field selctor](https://kubernetes.io/docs/concepts/overview/working-with-objects/field-selectors/)** Field selectors let you select Kubernetes resources based on the value of one or more resource fields. Here are some examples of field selector queries:
+
+```
+metadata.name=my-service
+
+metadata.namespace!=default
+
+status.phase=Pending
+```
+
+**[Tips selector](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-phase)** follow some field selectors to make easy your querys
+
+**[Pod phase](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-phase)**
+
+```
+kubectl get pods --field-selector status.phase==<Status>
+```
+
+Status Value | Description
+:---:|:---:
+Pending | The Pod has been accepted by the Kubernetes system, but one or more of the Container images has not been created. This includes time before being scheduled as well as time spent downloading images over the network, which could take a while.
+Running | The Pod has been bound to a node, and all of the Containers have been created. At least one Container is still running, or is in the process of starting or restarting.
+Succeeded | All Containers in the Pod have terminated in success, and will not be restarted.
+Failed | All Containers in the Pod have terminated, and at least one Container has terminated in failure. That is, the Container either exited with non-zero status or was terminated by the system.
+Unknown | For some reason the state of the Pod could not be obtained, typically due to an error in communicating with the host of the Pod.
+
+You can use some conditions as `!=`, `==` or `=`
+
+```
+kubectl get pods --field-selector status.phase==Running
+
+kubectl get pods --field-selector metadata.namespace!=default
+
+kubectl get pods --field-selector metadata.namespace==default,status.phase==Running
+```
+---
 
 ## Understand Services and other network primitives.
 
