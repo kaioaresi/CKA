@@ -332,6 +332,87 @@ kubectl get pods --field-selector metadata.namespace==default,status.phase==Runn
 
 ## Understand Services and other network primitives.
 
+**[Services](https://kubernetes.io/docs/concepts/services-networking/service/)** An abstract way to expose an application running on a set of Pods as a network service.
+
+With Kubernetes you don’t need to modify your application to use an unfamiliar service discovery mechanism. Kubernetes gives Pods their own IP addresses and a single DNS name for a set of Pods, and can load-balance across them.
+
+![Alt k8s services](img/k8s_services.jpg)
+
+![Alt kube-proxy](img/kube_proxy.jpg)
+
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  name: nginx-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - image: nginx:1.7.9
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        ports:
+        - containerPort: 80
+          protocol: TCP
+```
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-nodeport
+spec:
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    nodePort: 30080
+  selector:
+    app: nginx
+```
+
+```
+cat << EOF | kubectl create -f -
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+spec:
+  containers:
+  - name: busybox
+    image: radial/busyboxplus:curl
+    args:
+    - sleep
+    - "1000"
+EOF
+```
+
+**[DNS for Services and Pods](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/)** Kubernetes DNS schedules a DNS Pod and Service on the cluster, and configures the kubelets to tell individual containers to use the DNS Service’s IP to resolve DNS names.
+
+**[A/AAAA records](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#a-aaaa-records)** “Normal” (not headless) Services are assigned a DNS A or AAAA record, depending on the IP family of the service, for a name of the form `my-svc.my-namespace.svc.cluster-domain.example`. This resolves to the cluster IP of the Service.
+
+“Headless” (without a cluster IP) Services are also assigned a DNS A or AAAA record, depending on the IP family of the service, for a name of the form `my-svc.my-namespace.svc.cluster-domain.example`. Unlike normal Services, this resolves to the set of IPs of the pods selected by the Service. Clients are expected to consume the set or else use standard `round-robin` selection from the set.
+
+**[SRV records](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#srv-records)** SRV Records are created for named ports that are part of normal or Headless Services. For each named port, the SRV record would have the form `_my-port-name._my-port-protocol.my-svc.my-namespace.svc.cluster-domain.example`. For a regular service, this resolves to the port number and the domain name: `my-svc.my-namespace.svc.cluster-domain.example`. For a headless service, this resolves to multiple answers, one for each pod that is backing the service, and contains the port number and the domain name of the pod of the form `auto-generated-name.my-svc.my-namespace.svc.cluster-domain.example`.
+
 ---
 # References
 
