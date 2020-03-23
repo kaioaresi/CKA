@@ -499,7 +499,7 @@ kubectl get nodes
 
 ![Alt cluster high availability](img/cluster-high-availability.png)
 
-[More information](cluster_mult_master/README.md)
+I maked a lab with this kind of cluster to,[more information](cluster_mult_master/README.md)
 
 ```
 kubectl get pods -o custom-columns=POD:metadata.name,NODE:spec.nodeName --sort-by spec.nodeName -n kube-system
