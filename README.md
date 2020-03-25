@@ -495,15 +495,97 @@ sudo kubeadm join <token>
 kubectl get nodes
 ```
 
-## Lecture: Building a Highly Available Kubernetes Cluster
+## Building a Highly Available Kubernetes Cluster
 
 ![Alt cluster high availability](img/cluster-high-availability.png)
 
 I maked a lab with this kind of cluster to,[more information](cluster_mult_master/README.md)
 
+To see all components in each node.
+
 ```
 kubectl get pods -o custom-columns=POD:metadata.name,NODE:spec.nodeName --sort-by spec.nodeName -n kube-system
 ```
+
+## Configuring Secure Cluster Communications
+
+To prevent unauthorized users from modifying the cluster state, RBAC is used, defining roles and role bindings for a user. A service account resource is created for a pod to determine how it has control over the cluster state. For example, the default service account will not allow you to list the services in a namespace.
+
+
+In the documentation says, we as sysadmin, should use Transport Layer Security (TLS) for all API traffic, and should know each component to identify potentially unsecured traffic.
+
+### API Authentication
+
+Choose an authentication mechanism for the API servers to use that matches the common access patterns when you install a cluster. For instance, small single user clusters may wish to use a simple certificate or static Bearer token approach. Larger clusters may wish to integrate an existing OIDC or LDAP server that allow users to be subdivided into groups.
+
+All API clients must be [authenticated](https://kubernetes.io/docs/reference/access-authn-authz/authentication/), even those that are part of the infrastructure like nodes, proxies, the scheduler, and volume plugins. These clients are typically service accounts or use x509 client certificates, and they are created automatically at cluster startup or are setup as part of the cluster installation.
+
+### API Authorization
+
+Once authenticated, every API call is also expected to pass an authorization check. Kubernetes ships an integrated Role-Based Access Control (RBAC) component that matches an incoming user or group to a set of permissions bundled into roles. These permissions combine verbs (get, create, delete) with resources (pods, services, nodes) and can be namespace or cluster scoped. A set of out of the box roles are provided that offer reasonable default separation of responsibility depending on what actions a client might want to perform. It is recommended that you use the Node and RBAC authorizers together, in combination with the NodeRestriction admission plugin.
+
+As with authentication, simple and broad roles may be appropriate for smaller clusters, but as more users interact with the cluster, it may become necessary to separate teams into separate namespaces with more limited roles.
+
+With authorization, it is important to understand how updates on one object may cause actions in other places. For instance, a user may not be able to create pods directly, but allowing them to create a deployment, which creates pods on their behalf, will let them create those pods indirectly. Likewise, deleting a node from the API will result in the pods scheduled to that node being terminated and recreated on other nodes. The out of the box roles represent a balance between flexibility and the common use cases, but more limited roles should be carefully reviewed to prevent accidental escalation. You can make roles specific to your use case if the out-of-box ones don’t meet your needs.
+
+### Controlling access to the Kubelet
+
+Kubelets expose HTTPS endpoints which grant powerful control over the node and containers. By default Kubelets allow unauthenticated access to this API.
+
+Production clusters should enable Kubelet [authentication](https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-authentication-authorization/) and authorization.
+
+![Alt auth flow](img/auth_diagram.png)
+
+---
+
+
+![Alt roles and access](img/diagram_roles_access.png)
+
+Create a new user and `config` file with certificate
+
+```
+openssl req -new -newkey rsa:4096 -nodes -keyout dev.key -out dev.csr -subj "/CN=dev/O=dev"
+openssl x509 -req -in dev.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -out dev.crt -days 365
+cp /etc/kubernetes/pki/ca.crt ./k8s.crt
+```
+
+```
+cat <<EOF> dev-csr.yaml
+apiVersion: certificates.k8s.io/v1beta1
+kind: CertificateSigningRequest
+metadata:
+  name: dev-access
+  namespace: <namespace>
+spec:
+  groups:
+  - system:authenticated
+  request: $(cat dev.csr | base64 | tr -d '\n')
+  usages:
+  - client authcertificatesigningrequest.certificates.k8s.io/dev-access created
+EOF
+```
+
+```
+kubectl -n <namespace> create -f dev-csr.yaml
+kubectl -n <namespace> get csr
+kubectl -n <namespace> certificate approve dev-access
+kubectl -n <namespace> get csr
+```
+
+```
+kubectl -n <namespace> config set-cluster $(kubectl config view -o jsonpath='{.clusters[0].name}') --server=$(kubectl config view -o jsonpath='{.clusters[0].cluster.server}') --certificate-authority=k8s.crt --kubeconfig=dev-config --embed-certs
+
+kubectl -n <namespace> config set-credentials dev --client-certificate=dev.crt --client-key=dev.key --embed-certs --kubeconfig=dev-config
+
+kubectl -n <namespace> config set-context dev --cluster=$(kubectl config view -o jsonpath='{.clusters[0].name}') --namespace=dev --user=dev --kubeconfig=dev-config
+```
+
+```
+kubectl config use-context dev --kubeconfig=dev-config
+kubectl version --kubeconfig=dev-config
+kubectl -n <namespace> get pods --kubeconfig=dev-config
+```
+
 
 ---
 # References
@@ -529,3 +611,9 @@ kubectl get pods -o custom-columns=POD:metadata.name,NODE:spec.nodeName --sort-b
 - [Kubernetes high-availability ](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/)
 - [HA topology](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/ha-topology/)
 - [Configure upgrade etcd](https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/)
+- [Configuration services account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/)
+- [Cluster admin](https://kubernetes.io/docs/concepts/cluster-administration/cluster-administration-overview/)
+- [Access controlling](https://kubernetes.io/docs/reference/access-authn-authz/controlling-access/)
+- [Authorization](https://kubernetes.io/docs/reference/access-authn-authz/authorization/)
+- [http proxy access api](https://kubernetes.io/docs/tasks/access-kubernetes-api/http-proxy-access-api/)
+- [Securing a cluster](https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster)
