@@ -417,12 +417,20 @@ EOF
 
 ---
 
-## Installation, Configuration & Validation - 12%
+# 2 - Installation, Configuration & Validation - 12%
 
-### Basic cluster
+### Design a Kubernetes cluster.
 
-#### On all nodes
-Install docker
+@TODO
+
+
+### Install Kubernetes masters and nodes.
+
+#### Basic cluster
+
+**On all nodes**
+
+Install docker (Container runtime)
 
 ```
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -449,6 +457,7 @@ sudo apt-get install -y docker-ce=18.06.1~ce~3-0~ubuntu kubelet=1.15.7-00 kubead
 ```
 
 Hold them at the current version:
+
 ```
 sudo apt-mark hold docker-ce kubelet kubeadm kubectl
 ```
@@ -460,7 +469,7 @@ sudo sysctl -p
 ```
 
 
-#### Only master node
+**Only master node**
 
 ```
 kubeadm config images pull
@@ -481,7 +490,7 @@ Apply Flannel CNI network overlay:
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 ```
 
-#### Only wokers
+**Only wokers**
 
 Join the worker nodes to the cluster:
 
@@ -489,7 +498,7 @@ Join the worker nodes to the cluster:
 sudo kubeadm join <token>
 ```
 
-#### Validation
+**Validation**
 
 ```
 kubectl get nodes
@@ -535,8 +544,6 @@ Kubelets expose HTTPS endpoints which grant powerful control over the node and c
 Production clusters should enable Kubelet [authentication](https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-authentication-authorization/) and authorization.
 
 ![Alt auth flow](img/auth_diagram.png)
-
----
 
 
 ![Alt roles and access](img/diagram_roles_access.png)
@@ -585,6 +592,73 @@ kubectl config use-context dev --kubeconfig=dev-config
 kubectl version --kubeconfig=dev-config
 kubectl -n <namespace> get pods --kubeconfig=dev-config
 ```
+
+#### Lab
+
+1 - List all nodes in the cluster
+
+```
+kubectl get nodes
+```
+
+2 - List all pods in all namespaces
+
+```
+kubectl get pods --all-namespaces
+```
+
+3 - List all the namespaces in the cluster
+
+```
+kubectl get namespaces
+```
+
+4 - Check to see if there are any pods running in the default namespace
+
+```
+kubectl -n default get pods
+```
+
+5 - Find the ip address of the API server running on the master node
+
+```
+kubectl get pods --all-namespaces -o wide
+```
+
+6 - See if there are any deployment in this cluster
+
+```
+kubectl get deployment
+```
+
+7 - Find the label applied to the etcd pod on the master node
+
+```
+kubectl get pods --all-namespaces -o wide --show-labels
+```
+
+---
+
+#### Configure secure cluster communications.
+
+#### Configure a Highly-Available Kubernetes cluster.
+
+#### Know where to get the Kubernetes release binaries.
+
+#### Provision underlying infrastructure to deploy a Kubernetes cluster.
+
+#### Choose a network solution.
+
+#### Choose your Kubernetes infrastructure configuration.
+
+#### Run end-to-end tests on your cluster.
+
+#### Analyse end-to-end tests results.
+
+#### Run Node end-to-end tests.
+
+#### Install and use kubeadm to install, confi gure, and manage Kubernetes clusters
+
 
 ---
 # References
