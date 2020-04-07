@@ -414,6 +414,36 @@ EOF
 **[SRV records](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#srv-records)** SRV Records are created for named ports that are part of normal or Headless Services. For each named port, the SRV record would have the form `_my-port-name._my-port-protocol.my-svc.my-namespace.svc.cluster-domain.example`. For a regular service, this resolves to the port number and the domain name: `my-svc.my-namespace.svc.cluster-domain.example`. For a headless service, this resolves to multiple answers, one for each pod that is backing the service, and contains the port number and the domain name of the pod of the form `auto-generated-name.my-svc.my-namespace.svc.cluster-domain.example`.
 
 ---
+
+## Installation, Configuration & Validation - 12%
+
+#### Design a Kubernetes cluster.
+
+#### Install Kubernetes masters and nodes.
+
+#### Configure secure cluster communications.
+
+#### Configure a Highly-Available Kubernetes cluster.
+
+#### Know where to get the Kubernetes release binaries.
+
+#### Provision underlying infrastructure to deploy a Kubernetes cluster.
+
+#### Choose a network solution.
+
+#### Choose your Kubernetes infrastructure configuration.
+
+#### Run end-to-end tests on your cluster.
+
+#### Analyse end-to-end tests results.
+
+#### Run Node end-to-end tests.
+
+#### Install and use kubeadm to install, confi gure, and manage Kubernetes clusters
+
+
+
+---
 # References
 
 - [What is kubernetes](https://kubernetes.io/docs/concepts/overview/what-is-kubernetes/)
