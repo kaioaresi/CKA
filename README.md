@@ -617,3 +617,4 @@ kubectl -n <namespace> get pods --kubeconfig=dev-config
 - [Authorization](https://kubernetes.io/docs/reference/access-authn-authz/authorization/)
 - [http proxy access api](https://kubernetes.io/docs/tasks/access-kubernetes-api/http-proxy-access-api/)
 - [Securing a cluster](https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster)
+- [Explore kubernetes RBAC](https://www.youtube.com/watch?v=J3DFi4yXZX0&feature=youtu.be)
