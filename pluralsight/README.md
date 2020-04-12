@@ -7,6 +7,9 @@
 - TCP/IP base networking
 - Fundamental concepts of containers
 
+---
+
+# Core Concepts - 19%
 
 ## Introduction and exploring kubernetes architecture
 
@@ -188,6 +191,8 @@ With Kubernetes you don’t need to modify your application to use an unfamiliar
 
 Resumo: Services são uma abstração de rede para acesso os pods, ele é responsável por atualizar entregar e balancear requisições recebidas para os pods, sua estrategia de balanceamento padrão é "round robin".
 
+![Alt service](img/service.jpg)
+
 ---
 
 ### [Storage](https://kubernetes.io/docs/concepts/storage/)
@@ -299,8 +304,25 @@ The container runtime is the software that is responsible for running containers
 
 Kubernetes supports several container runtimes: Docker, containerd, CRI-O, and any implementation of the Kubernetes CRI (Container Runtime Interface).
 
----
+
+##### Control plane and Nodes components
 
 ![Alt Components of kubernetes](img/components-of-kubernetes.png)
+
+
+##### [Addons](https://kubernetes.io/docs/concepts/cluster-administration/addons/)
+
+> https://kubernetes.io/docs/concepts/overview/components/#addons
+
+Addons use Kubernetes resources (DaemonSet, Deployment, etc) to implement cluster features. Because these are providing cluster-level features, namespaced resources for addons belong within the kube-system namespace.
+
+Selected addons are described below; for an extended list of available addons, please see Addons.
+
+![Alt Add-ons](img/addons.jpg)
+
+- [DNS](https://kubernetes.io/docs/concepts/overview/components/#dns)
+- [Web UI](https://kubernetes.io/docs/concepts/overview/components/#web-ui-dashboard)
+- [Container resource monitoring](https://kubernetes.io/docs/concepts/overview/components/#container-resource-monitoring)
+- [Cluster level logging](https://kubernetes.io/docs/concepts/overview/components/#cluster-level-logging)
 
 ---
