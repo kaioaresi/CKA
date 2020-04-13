@@ -6,5 +6,5 @@
 ## Pod (coletivo de baleias)
 > http://www.whalefacts.org/whats-is-a-group-of-whales-called
 ## ReplicaSet
-
+  
 ## Deployment
