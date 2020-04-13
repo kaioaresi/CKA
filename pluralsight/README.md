@@ -326,3 +326,28 @@ Selected addons are described below; for an extended list of available addons, p
 - [Cluster level logging](https://kubernetes.io/docs/concepts/overview/components/#cluster-level-logging)
 
 ---
+
+# Installation, Configuration & Validation - 12%
+
+> https://jamesdefabia.github.io/docs/getting-started-guides/
+
+**Consideration **
+
+- Cluster networking
+- Scalability
+- Hight availability
+- Disaster recovery
+
+**Installation Methods**
+
+- Desktop
+- [Kubeadmin](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
+- [Scratch](https://medium.com/@hashithkarunarathne/create-a-kubernetes-cluster-from-the-scratch-on-centos-7-rhel-7-and-deploy-an-application-on-85a92997b565)
+- Cloud scenarios
+
+**Requirements**
+![Alt requirements](./img/requiriments_k8s.jpg)
+
+**Cluster networking**
+
+![Alt networking](./img/network_ports.jpg)
