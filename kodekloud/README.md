@@ -75,3 +75,96 @@
 - https://github.com/mmumshad/kubernetes-the-hard-way
 
 ---
+
+# Core Concepts - `19%`
+
+## Cluster architecture
+
+**Master node - Control plane**
+
+- Manage
+- Plan
+- Schedule
+- Monitor
+- Nodes
+
+## Master Components
+
+- ETCD - armazena dados do cluster, formato key-value
+- Scheduler - responsável por verificar se existe recurso em um node e realizar o deploy do pod
+-  Controller-manager - responsável por gerenciar controllers e nodes
+- Kube-api - responsável por todas operações dentro do cluster
+
+
+**Worker node**
+
+- Host aplication as containers
+
+## Nodes components - all nodes
+
+- Container runtimer (docker, ContainerD e etc)
+- Kubelet - recebe e executa instruções do contral plane
+- kube-proxy - responsável pela comunicação entre componentes do cluster, como services, pods e etc.
+
+##**Conrol plane components**
+
+### ETCD
+
+**What is [ETCD](https://kubernetes.io/docs/concepts/overview/components/#etcd)?**
+> https://etcd.io/docs/v3.4.0/
+
+ETCD is a distributed reliable key-value store that is simple, secure & fast, your default port is `2379`.
+
+**Explore ETCD**
+
+```
+kubectl exec etcd-master -n kube-system etcdctl get / --prefix -key-only
+```
+
+### Kube-API
+
+É o unico componente que comunica com o ETCD, todos demais componentes devem se comunicar com o kube-api para que o kube-api se comunique com o ETCD.
+
+
+**Create pod flow**
+
+1 - Authenticate user
+2 - Validate request
+3 - Retrieve data
+4 - Update ETCD
+5 - Scheduler
+6 - Kubelet
+7 - Update ETCD com o status do deploy do pod.
+
+**Path configfile - setup kubeadm**
+
+- `/etc/kubernetes/manifests/kube-apiserver.yaml`
+
+- `/etc/systemd/system/kube-apiserver.service`
+
+### Controller-manager
+
+- Watch status
+- Remediate situation
+
+Manager and monitoring every single controller:
+
+- Deployment
+- Replicaset
+- ReplicationController
+- Statefulset
+- CronJob
+- Namespace-controller
+- Endpoing-controller
+- Job-controller
+- PV- protection-controller
+- Pv-binder-controller
+
+**Node controller**
+
+Check node every `5s` and is the node doesn't retry in `40s`, it's mark as `unreachable` and `5m` later `notReady`
+
+
+### Kube-scheduler
+
+Responsable to say where each pod go to each node, and to the Kubelet plays. kube-scheduler try to find the best node to the pod, first it make the filter nodes and after rank Nodes.
