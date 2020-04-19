@@ -169,10 +169,38 @@ Check node every `5s` and is the node doesn't retry in `40s`, it's mark as `unre
 
 Responsable to say where each pod go to each node, and to the Kubelet plays. kube-scheduler try to find the best node to the pod, first it make the filter nodes and after rank Nodes.
 
-### Kubelet
+#### Kubelet
 
 It's node's agente, it receive control planes commands, and play, it regiser node, create pods, monitor node & pods.
 
-### Kube-proxy
+#### Kube-proxy
 
 ![Alt kube-proxy](../img/kube-proxy.jpg)
+
+#### Pods
+
+It's the must basic kubernetes object, it can have one or more container inside then.
+
+> Tip: Inside the pod, it's good practices don't have the same kind of container inside then
+
+**Create new pod aplication**
+> https://kubernetes.io/docs/reference/kubectl/docker-cli-to-kubectl/
+
+```
+kubectl run --image=nginx nginx-app --port=80
+```
+
+YAML file
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: exmplo-pod
+  labels:
+    app: exemplo
+spec:
+  containers:
+    - name: container-exemplo
+      image: nginx
+```
