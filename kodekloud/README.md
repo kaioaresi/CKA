@@ -204,3 +204,59 @@ spec:
     - name: container-exemplo
       image: nginx
 ```
+
+#### Controllers
+
+**Replicaset vs Replication Controller**
+> https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/
+
+
+It's controller to keep the pods up, if happening some error it try to up the pods again
+
+```
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: rc-myapp
+  labels:
+    app: myappp
+    type: front-end
+spec:
+  replicas: 3
+  template:
+    metadata:
+      name: myapp-pod
+      labels:
+        app: myapp
+        type: front-end
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx
+```
+
+```
+apiVersion: app/v1
+kind: ReplicaSet
+metadata:
+  name: rs-myapp
+  labels:
+    app: myapp
+    type: front-end
+spec:
+  replicas: 3
+  template:
+    metadata:
+      name: myapp-pod
+      labels:
+        app: myapp
+        type: front-end
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx
+  selector: # this options doesn't existe on ReplicationController
+    matchLabels:
+      type: myapp
+```
