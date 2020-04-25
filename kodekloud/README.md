@@ -261,6 +261,69 @@ spec:
       type: myapp
 ```
 
+**deployment**
+> https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+
+A Deployment provides declarative updates for Pods and ReplicaSets.
+
+You describe a desired state in a Deployment, and the Deployment Controller changes the actual state to the desired state at a controlled rate. You can define Deployments to create new ReplicaSets, or to remove existing Deployments and adopt all their resources with new Deployments.
+
+- Create
+```
+kubectl create deployment my-app-teste --image=busybox
+kubectl run my-app --image=nginx --replicas=2 --port=80
+```
+- Update
+```
+kubectl set image deploy my-app-teste busybox=nginx
+```
+- Rollback
+```
+kubectl rollout history deploy my-app-teste
+kubectl rollout undo deploy my-app-teste # volta ao status anterior
+```
+- Scaling
+```
+kubectl scale deploy my-app-teste --replicas=X
+```
+- Pausing
+```
+kubectl rollout pause deploy my-app-teste
+kubectl rollout resume deploy my-app-teste # despausar
+```
+
+![Alt deployment](../img/deployment.jpg)
+
+**YAML**
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: my-app-teste
+  name: my-app-teste
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app-teste
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: my-app-teste
+    spec:
+      containers:
+      - image: busybox
+        name: busybox
+        resources: {}
+status: {}
+```
+
+
 ---
 ## Certification Tip!
 
@@ -308,3 +371,99 @@ kubectl create deployment --image=nginx nginx --dry-run -o yaml > nginx-deployme
 
 Save it to a file, make necessary changes to the file (for example, adding more replicas) and then create the deployment.
 
+---
+
+## Namespace
+> https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
+
+Kubernetes supports multiple virtual clusters backed by the same physical cluster. These virtual clusters are called namespaces.
+
+![Alt namespace](../img/switch_namespace_default.jpg)
+
+**Create**
+```
+kubectl create namespace <nome namespace>
+# or
+kubectl create ns <nome namespace>
+```
+**Delete**
+```
+kubectl delete namespace <nome namespace>
+# or
+kubectl delete ns <nome namespace>
+```
+
+**List**
+
+```
+kubectl get --namespace kube-system pods
+```
+
+**Describe**
+
+```
+kubectl describe ns kube-system
+```
+**Limit range**
+> https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/memory-default-namespace/
+
+
+Basicamente define um limite pãdro de recursos (memory e CPU) que é automaticamente aplicado em cada pod, se caso já existir um limite no pod maior que o limite definido ele ficará com `pending`, por falta de recursos.
+
+```
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: mem-limit-range
+spec:
+  limits:
+  - default:
+      memory: 512Mi
+    defaultRequest:
+      memory: 256Mi
+    type: Container
+```
+
+
+
+**Namespace quote resource**
+> https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/quota-memory-cpu-namespace/#create-a-resourcequota
+https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/memory-constraint-namespace/
+
+Limite máximo do namespace.
+
+The ResourceQuota places these requirements on the quota-mem-cpu-example namespace:
+
+- Every Container must have a memory request, memory limit, cpu - request, and cpu limit.
+- The memory request total for all Containers must not exceed 1 - GiB.
+- The memory limit total for all Containers must not exceed 2 GiB.
+- The CPU request total for all Containers must not exceed 1 cpu.
+- The CPU limit total for all Containers must not exceed 2 cpu.
+
+
+**CLI**
+
+```
+kubectl -n teste create quota quota-teste --hard=cpu=1,memory=100m,pods=2,services=2,replicationcontrollers=2,resourcequotas=1,secrets=5,persistentvolumeclaims=10
+```
+
+**YAML**
+
+```
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  creationTimestamp: null
+  name: quota-teste
+  namespace: teste
+spec:
+  hard:
+    cpu: "1"
+    memory: 100m
+    persistentvolumeclaims: "10"
+    pods: "2"
+    replicationcontrollers: "2"
+    resourcequotas: "1"
+    secrets: "5"
+    services: "2"
+```
