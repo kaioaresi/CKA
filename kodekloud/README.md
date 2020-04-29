@@ -523,6 +523,12 @@ Generate POD Manifest YAML file (-o yaml). Don't create it(--dry-run)
 kubectl run --generator=run-pod/v1 nginx --image=nginx --dry-run -o yaml
 ```
 
+** Busybox
+```
+kubectl run --generator=run-pod/v1 curl-pod --rm -ti --image=busybox --restart=Never -- sh
+```
+
+
 **Deployment**
 
 Create a deployment
@@ -600,5 +606,9 @@ kubectl create service nodeport nginx --tcp=80:80 --node-port=30080 --dry-run -o
 (This will not use the pods labels as selectors)
 
 Both the above commands have their own challenges. While one of it cannot accept a selector the other cannot accept a node port. I would recommend going with the `kubectl expose` command. If you need to specify a node port, generate a definition file using the same command and manually input the nodeport before creating the service.
+
+---
+
+
 
 ****************
