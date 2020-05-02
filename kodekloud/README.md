@@ -609,6 +609,137 @@ Both the above commands have their own challenges. While one of it cannot accept
 
 ---
 
+# Scheduling - `5%`
+
+> https://kubernetes.io/docs/concepts/scheduling-eviction/kube-scheduler/
+https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes/#create-a-pod-that-gets-scheduled-to-specific-node
+
+In Kubernetes, scheduling refers to making sure that Pods are matched to Nodes so that Kubelet can run them.
+
+**Manual scheduling**
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  nodeName: foo-node # schedule pod to specific node
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+```
+
+**Labels and selector**
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+    type: frontend
+spec:
+  nodeName: foo-node # schedule pod to specific node
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+```
+
+**Selector**
+```
+kubectl run teste --image=nginx --labels="app=nginx,env=prod"
+kubectl get pods --show-labels
+kubectl get pods -L app,env
+kubectl get pod --selector app=nginx
+kubectl get pod --selector app=nginx,env=prod
+```
+
+**Annotations**
+
+You can use Kubernetes annotations to attach arbitrary non-identifying metadata to objects. Clients such as tools and libraries can retrieve this metadata.
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: annotations-demo
+  annotations:
+    imageregistry: "https://hub.docker.com/"
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
+```
+
+## Taint and Toleration
+
+> https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+
+Taints and tolerations work together to ensure that pods are not scheduled onto inappropriate nodes. One or more taints are applied to a node; this marks that the node should not accept any pods that do not tolerate the taints. Tolerations are applied to pods, and allow (but do not require) the pods to schedule onto nodes with matching taints.
+
+Effect
+
+- NoSchedule: if there is at least one un-ignored taint with effect NoSchedule then Kubernetes will not schedule the pod onto that node.
+- PreferNoSchedule: f there is no un-ignored taint with effect NoSchedule but there is at least one un-ignored taint with effect PreferNoSchedule then Kubernetes will try to not schedule the pod onto the node.
+- NoExecute: if there is at least one un-ignored taint with effect NoExecute then the pod will be evicted from the node (if it is already running on the node), and will not be scheduled onto the node (if it is not yet running on the node).
+
+
+```
+kubectl taint nodes gke-lab-cka-default-pool-16b589fc-894f app=blue:NoSchedule # add apenas app blue podem executadas neste node
+kubectl taint nodes gke-lab-cka-default-pool-16b589fc-894f app:NoSchedule- # removendo taint
+```
+**Toleration**
+
+A toleration “matches” a taint if the keys are the same and the effects are the same, and:
+
+- the operator is Exists (in which case no value should be - specified), or
+- the operator is Equal and the values are equal
+
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx
+    env: prod
+  name: front-blue
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+      env: prod
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: nginx
+        env: prod
+    spec:
+      tolerations:
+      - key: "app"
+        operator: "Equal"
+        value: "blue"
+        effect: "NoSchedule"
+      containers:
+      - image: nginx
+        imagePullPolicy: Always
+        name: front-blue
+```
+
+
+
 
 
 ****************
