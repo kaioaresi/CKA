@@ -738,6 +738,136 @@ spec:
         name: front-blue
 ```
 
+**Node selector**
+
+> https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+
+We can create a label to identify some node, for exemplo kind of disktype
+
+- With node selector you don't hava condictions as Large OR Medium
+- NOT Small
+
+```
+kubectl label node <node name> <key>=value
+```
+
+```
+pods/pod-nginx.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    env: test
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  nodeSelector:
+    disktype: ssd # label node
+```
+
+**Node affinity and anti-affinity**
+
+> https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+
+Node affinity is conceptually similar to nodeSelector -- it allows you to constrain which nodes your pod is eligible to be scheduled on, based on labels on the node.
+
+
+- | DuringScheduling | DuringExecution | Type
+:---:|:---:|:---:|:---:|
+requiredDuringSchedulingIgnoredDuringExecution | Required | Ignored | Available
+preferredDuringSchedulingIgnoredDuringExecution | Preferred | Ignored | Available
+requiredDuringSchedulingRequiredDuringExecution | Required | Required | Planned
+
+
+**In two or more labels**
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: teste-2
+  name: teste-2
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: size
+            operator: In
+            values:
+            - large
+            - medium
+  containers:
+  - image: nginx
+    name: teste-2
+  restartPolicy: Always
+```
+
+**Not in Label**
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: teste-3
+  name: teste-3
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: size
+            operator: NotIn
+            values:
+            - large
+  containers:
+  - image: nginx
+    name: teste-3
+  restartPolicy: Always
+```
+
+**Exist label**
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: teste-5
+  name: teste-5
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: size
+            operator: Exists
+  containers:
+  - image: nginx
+    name: teste-5
+  restartPolicy: Always
+```
+
+
+
+
+
+
+
+
+
 
 
 
