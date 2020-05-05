@@ -631,7 +631,7 @@ spec:
     imagePullPolicy: IfNotPresent
 ```
 
-**Labels and selector**
+## Labels and selector
 
 ```
 apiVersion: v1
@@ -860,16 +860,113 @@ spec:
   restartPolicy: Always
 ```
 
+### Node affinity VS Taints and Tolerations
 
+**Taints and Tolerations**
 
+Um novo é marcado, para que ele recebera pods que possuem a mesma marca(tain) e tolerancia, porém o pod podera se schedulado em outro node.
 
+**Node affinity**
 
+Identifica um node com uma label e através desta lable o pod sabe em qual node ele será schedulado, isso não garante que outro pods podem ou não se schedulados nesse node.
 
+## Resource limit
 
+> https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/memory-default-namespace/
+https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/cpu-default-namespace/
+https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource
 
+**Note on default resource requirements and limits**
 
+In the previous lecture, I said - "When a pod is created the containers are assigned a default CPU request of .5 and memory of 256Mi". For the POD to pick up those defaults you must have first set those as default values for request and limit by creating a LimitRange in that namespace.
 
+**LimitRange memory**
 
+```
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: mem-limit-range
+spec:
+  limits:
+  - default:
+      memory: 512Mi
+    defaultRequest:
+      memory: 256Mi
+    type: Container
+```
 
+**LimitRange CPU**
+
+```
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-limit-range
+spec:
+  limits:
+  - default:
+      cpu: 1
+    defaultRequest:
+      cpu: 0.5
+    type: Container
+```
+
+**YAML**
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: frontend
+spec:
+  containers:
+  - name: db
+    image: mysql
+    env:
+    - name: MYSQL_ROOT_PASSWORD
+      value: "password"
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+```
+
+**CLI**
+
+```
+kubectl run teste --image=nginx --requests="cpu=0.2,memory=256Mi" --limits="cpu=0.5,memory=512Mi"
+```
+
+## Daemon sets
+
+> https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/
+
+A DaemonSet ensures that all (or some) Nodes run a copy of a Pod. As nodes are added to the cluster, Pods are added to them. As nodes are removed from the cluster, those Pods are garbage collected. Deleting a DaemonSet will clean up the Pods it created.
+
+![Alt daemonset](../img/daemonset.jpg)
+
+```
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: monitor-daemon
+spec:
+  selector:
+    matchLabels:
+      app: monitor-agent
+  template:
+    metadata:
+      labels:
+        app: monitor-agent
+    spec:
+      containers:
+      - name: monitor-agent
+        image: monitor-agent:latest
+```
 
 ****************
