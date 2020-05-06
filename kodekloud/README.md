@@ -780,7 +780,7 @@ Node affinity is conceptually similar to nodeSelector -- it allows you to constr
 :---:|:---:|:---:|:---:|
 requiredDuringSchedulingIgnoredDuringExecution | Required | Ignored | Available
 preferredDuringSchedulingIgnoredDuringExecution | Preferred | Ignored | Available
-requiredDuringSchedulingRequiredDuringExecution | Required | Required | Planned
+requiredDuringSchedulingRequiredDuringExecution | Required | Required | Planned |
 
 
 **In two or more labels**
@@ -968,5 +968,23 @@ spec:
       - name: monitor-agent
         image: monitor-agent:latest
 ```
+
+## Static pods
+> https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/
+
+`Static Pods` are managed directly by the `kubelet` daemon on a specific node, `without the API server observing them`. Unlike Pods that are managed by the control plane (for example, a Deployment); instead, the `kubelet` watches each static Pod (and restarts it if it crashes).
+
+If you lost your nodes master for some reason, you can run the pod alone on the nodes, you can create just `pods`, copy the yaml files to flow directory `/etc/kubernetes/manifests`.
+
+![Alt Static pod](../img/static_pod.jpg)
+
+Static PODs | DaemonSet
+:---:|:---:
+Created bu the kubelet | Created by kube-API server (DaemonSet controller)
+Deploy Control plane component `Static Pods` | Deploy Monitoring agents, Logging agents on nodes
+Ignored by the kube-scheduler | Ignored by the kube-scheduler
+
+
+
 
 ****************
