@@ -984,7 +984,22 @@ Created bu the kubelet | Created by kube-API server (DaemonSet controller)
 Deploy Control plane component `Static Pods` | Deploy Monitoring agents, Logging agents on nodes
 Ignored by the kube-scheduler | Ignored by the kube-scheduler
 
+## Multiple schedule
+
+> https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+
+---
+
+# Logging / Monitoring - `5%`
+
 
 
 
 ****************
+# Minikube
+
+**Metrics server**
+
+```
+minukube addons enable metrics-server
+```
