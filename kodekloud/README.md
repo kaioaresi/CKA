@@ -992,11 +992,61 @@ Ignored by the kube-scheduler | Ignored by the kube-scheduler
 
 # Logging / Monitoring - `5%`
 
+**Metrics**
+```
+minikube addons enable metrics-server
+```
 
+**Logs**
+
+> https://kubernetes.io/docs/concepts/cluster-administration/logging/
+
+```
+kubectl log <pod name> # show last logs
+kubectl log -f <pod name> # show current logs
+```
+
+---
+
+# Application Lifecycle Management - `8%`
+
+## Rolling updates and Rollbacks in deployments
+
+**Rollout and versioning**
+
+```
+kubectl rollout status <deployment>
+```
+**Rollback**
+
+```
+kubectl rollout history <object> <name> # show the histories objects
+kubectl rollout undo deploy <name>
+```
+
+![Alt](../img/rollout_update_rollback.jpg)
+
+**Set new image**
+```
+kubectl set image <object> <name> <old image>=<new image>
+```
 
 
 ****************
-# Minikube
+
+# Extras
+
+## Validate service
+
+```
+for i in {1..35}; do
+   kubectl exec --namespace=kube-public curl -- sh -c 'test=`wget -qO- -T 2  http://webapp-service.default.svc.cluster.local:8080/info 2>&1` && ec
+ho "$test OK" || echo "Failed"';
+   echo ""
+```
+
+
+## Minikube
 
 **Metrics server**
 
