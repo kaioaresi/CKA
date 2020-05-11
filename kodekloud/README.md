@@ -1190,6 +1190,65 @@ Kubernetes supports self-healing applications through ReplicaSets and Replicatio
 
 Kubernetes provides additional support to check the health of applications running within PODs and take necessary actions through Liveness and Readiness Probes. However these are not required for the CKA exam and as such they are not covered here. These are topics for the Certified Kubernetes Application Developers (CKAD) exam and are covered in the CKAD course.
 
+---
+
+## Cluster Maintenance - `11%`
+
+> https://kubernetes.io/docs/tasks/administer-cluster/cluster-management/
+
+### Operation system upgrade
+
+**Drain**
+
+The given node will be marked unschedulable to prevent new pods from arriving. 'drain' evicts the pods if the APIServer
+supportshttp://kubernetes.io/docs/admin/disruptions/ . Otherwise, it will use normal DELETE to delete the pods. The
+'drain' evicts or deletes all pods except mirror pods (which cannot be deleted through the API server).  If there are
+DaemonSet-managed pods, drain will not proceed without --ignore-daemonsets, and regardless it will not delete any
+DaemonSet-managed pods, because those pods would be immediately replaced by the DaemonSet controller, which ignores
+unschedulable markings.  If there are any pods that are neither mirror pods nor managed by ReplicationController,
+ReplicaSet, DaemonSet, StatefulSet or Job, then drain will not delete any pods unless you use --force.  --force will
+also allow deletion to proceed if the managing resource of one or more pods is missing.
+
+```
+kubectl drain <node name>
+```
+
+![Alt drain](../img/kubectl_drain.jpg)
+
+**Cordon**
+
+Mark node as unschedulable, but not move any pod.
+
+```
+kubectl cordon <node name>
+```
+
+
+**Uncordon**
+
+After you repair de node you can schedule pod again
+
+```
+kubectl uncordon <node name>
+```
+
+**Cluster upgrade**
+
+1 - Upgrade de `kubeadm`
+2 - Upgrade de node master
+
+```
+kubeadm upgrade apply <version>
+```
+
+3 - Upgrade `kubelet` too in your package manager and restart then
+4 - Upgrade de nodes, upgrade the `kubeadm` and `kubelet`
+
+```
+kubeadm upgrade node --v=5
+systemctl restart kubelet
+```
+
 ****************
 
 ## Minikube
