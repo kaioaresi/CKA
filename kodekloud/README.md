@@ -1484,12 +1484,82 @@ curl -v -k https://localhost:6443/api/v1/pods -u "user1:password123"
 
 ## TLS
 
+> https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/
+
 - What are TLS certificates ?
+
+São certificados validados por uma entidade certificadora, que valida a authentidade (CA - certificate authority), existem dois tipo sendo eles privado (*.pem) e publicos (*.key, *-key.pem), já os certificados possuem a extenção (*.crt).
+
+
 - How does kubernetes use certificates ?
+
+![Alt certificate server](../img/server_certificate.jpg)
+
+![Alt certificates](../img/certificates.jpg)
+
 - How to generate them ?
+
+Outras opções para se gerar certificados:
+
+- Easyrsa
+- CFSLL
+- OpenSSL
+
+#### OpenSSL (Client certificate for clients)
+
+**Generate the private key**
+
+```
+openssl genrsa -out ca.key 2048
+```
+
+**Certificate signing request**
+
+```
+openssl req -new -key ca.key -subj "/CN=KUBERNETES-CA" -out ca.csr
+```
+
+**Sign certificates**
+
+```
+openssl x509 -req -in ca.csr -signkey ca.key -out ca.crt
+```
+
+##### Admin user
+
+**Generate the private key**
+
+```
+openssl genrsa -out admin.key 2048
+```
+
+**Certificate signing request**
+
+```
+openssl req -new -key admin.key -subj "/CN=kube-admin" -out admin.csr
+```
+
+**Sign certificates**
+
+```
+openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -out admin.crt
+```
+
+**Validate**
+
+```
+curl https://kube-apiserver:6443/api/v1/pods --key admin.key --cert admin.crt --cacert ca.crt
+```
+
+
+
+
 - How to configure them ?
 - How to view them ?
 - How to troubleshooting issues related to certificates
+
+
+
 
 
 ****************
