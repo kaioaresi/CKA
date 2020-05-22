@@ -1551,14 +1551,33 @@ openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -out admin.crt
 curl https://kube-apiserver:6443/api/v1/pods --key admin.key --cert admin.crt --cacert ca.crt
 ```
 
-
-
-
 - How to configure them ?
+
 - How to view them ?
+
+![Alt view certificate](../img/check_certificate.jpg)
+
 - How to troubleshooting issues related to certificates
 
+__Show logs__
 
+OS
+```
+jornalctl -u etcd.service -l
+```
+
+K8S
+
+```
+kubectl logs etcd-master
+```
+
+
+
+```
+openssl x509 -req -in /etc/kubernetes/pki/apiserver-etcd-client.csr -CA /etc/kubernetes/pki/etcd/ca.crt -CAkey /etc/kubernetes/pki/etcd/ca.key -CA
+createserial -out /etc/kubernetes/pki/apiserver-etcd-client.crt
+```
 
 
 
@@ -1571,3 +1590,11 @@ curl https://kube-apiserver:6443/api/v1/pods --key admin.key --cert admin.crt --
 ```
 minukube addons enable metrics-server
 ```
+
+## Security - TLS certificate
+
+> https://github.com/mmumshad/kubernetes-the-hard-way/tree/master/tools
+
+## Kubernetes the hard way
+
+> https://github.com/mmumshad/kubernetes-the-hard-way
