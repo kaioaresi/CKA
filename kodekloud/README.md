@@ -1572,13 +1572,37 @@ K8S
 kubectl logs etcd-master
 ```
 
+__Decode certificate__
 
+```
+openssl x509 -noout -text -in <certificate name>.crt
+openssl x509 -noout -text -in /etc/kubernetes/pki/apiserver.crt
+
+```
+__Exercises get certificates info__
+
+Certificate path | CN Name | ALT name | Organization | Issuer | Expiration
+:---:|:---:|:---:|:---:|:---:|:---:|
+`/etc/kubernetes/pki/apiserver.crt` | kube-apiserver | DNS:master, DNS:kubernetes,DNS:kubernetes.default,DNS:kubernetes.default.svc,IP Address:10.96.0.1,IP Address:172.17.0.27 |
+`/etc/kubernetes/pki/apiserver.key` | - | |
+`/etc/kubelet/pki/ca.crt` | Kubernetes | |
+`/etc/kubernetes/pki/ca.crt` | kubernetes | |
+`/etc/kubernetes/pki/apiserver-kubelet-client.crt` | kube-apiserver-kubelet-client | |
+`/etc/kubernetes/pki/apiserver-kubelet-client.key` | - |
+`/etc/kubernetes/pki/apiserver-etcd-client.crt` | kube-apiserver-etcd-client
+`/etc/kubernetes/pki//etc/kubernetes/pki/apiserver-etcd-client.key` | - |
+`/etc/kubernetes/pki/etcd/ca.crt` | kubernetes
 
 ```
 openssl x509 -req -in /etc/kubernetes/pki/apiserver-etcd-client.csr -CA /etc/kubernetes/pki/etcd/ca.crt -CAkey /etc/kubernetes/pki/etcd/ca.key -CA
 createserial -out /etc/kubernetes/pki/apiserver-etcd-client.crt
 ```
 
+__Sign new certificate__
+
+```
+openssl x509 -req -in apiserver-etcd-client.csr -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -out apiserver-etcd-client.crt
+```
 
 
 ****************
