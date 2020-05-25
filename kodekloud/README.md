@@ -1604,6 +1604,42 @@ __Sign new certificate__
 openssl x509 -req -in apiserver-etcd-client.csr -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -out apiserver-etcd-client.crt
 ```
 
+#### TLC certificate
+
+> https://kubernetes.io/docs/concepts/cluster-administration/certificates/
+
+```
+openssl genrsa -out cesar.key 2048
+
+openssl req -new -key cesar.key -subj "/CN=cesar" -days 10000 -out cesar.csr
+
+```
+
+__Create csr__
+
+```
+cat <<EOF | kubectl apply -f -
+apiVersion: certificates.k8s.io/v1beta1
+kind: CertificateSigningRequest
+metadata:
+  name: cesar
+spec:
+  request: $(cat cesar.csr | base64 | tr -d '\n')
+  usages:
+  - digital signature
+  - key encipherment
+  - server auth
+EOF
+```
+
+__Approve or deny__
+```
+kubectl certificate approve
+
+# OR
+
+kubectl certificate deny
+```
 
 ****************
 
