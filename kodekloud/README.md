@@ -1611,7 +1611,7 @@ openssl x509 -req -in apiserver-etcd-client.csr -CA etcd/ca.crt -CAkey etcd/ca.k
 ```
 openssl genrsa -out cesar.key 2048
 
-openssl req -new -key cesar.key -subj "/CN=cesar" -days 10000 -out cesar.csr
+openssl req -new -key cesar.key -subj "/CN=cesar" -out cesar.csr
 
 ```
 
@@ -1640,6 +1640,87 @@ kubectl certificate approve
 
 kubectl certificate deny
 ```
+
+__Curl__
+
+```
+curl https://my-kube-playgraound:6443/api/v1/pods \
+--key cesar.key \
+--cert cesar.crt \
+  --cacert ca.crt
+```
+
+### Kube-config
+
+![Alt kubeconfig](../img/kubeconfig.jpg)
+
+### API Groups
+
+> https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/
+
+__Get api groups available__
+
+```
+curl http://localhost:6443 -k
+```
+
+__Get resources groups__
+
+```
+curl http://localhost:6443/apis -k | grep "name"
+```
+
+__Connect to api__
+
+```
+curl http://localhost:6443 -k --key <user>.key --cert <user>.crt --cacert ca.crt
+```
+### RBAC
+
+> https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+
+__Roles__
+
+Is the group allow and deny, the user do something
+
+```
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: developer
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["get", "watch", "list", "create"]
+  resourceNames: ["default","developer"]
+```
+
+__RoleBinding__
+
+```
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  creationTimestamp: null
+  name: rb-devs
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: developer
+subjects:
+- kind: ServiceAccount
+  name: dev1
+  namespace: default
+```
+
+__Check if you can do something__
+
+```
+kubectl auth can-i <verb> <resource>
+kubectl auth can-i <verb> <resource> --as <user>
+```
+
 
 ****************
 
