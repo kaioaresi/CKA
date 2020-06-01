@@ -1721,6 +1721,37 @@ kubectl auth can-i <verb> <resource>
 kubectl auth can-i <verb> <resource> --as <user>
 ```
 
+__Clusterrole__
+
+```
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  # "namespace" omitted since ClusterRoles are not namespaced
+  name: secret-reader
+rules:
+- apiGroups: [""]
+  #
+  # at the HTTP level, the name of the resource for accessing Secret
+  # objects is "secrets"
+  resources: ["secrets"]
+  verbs: ["get", "watch", "list"]
+```
+
+__Clusterrolebinding__
+
+> https://kubernetes.io/docs/reference/access-authn-authz/rbac/#clusterrolebinding-example
+
+To grant permissions across a whole cluster, you can use a ClusterRoleBinding. The following ClusterRoleBinding allows any user in the group “manager” to read secrets in any namespace.
+
+### Image Security
+
+> https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+
+```
+kubectl create secret docker-registry <secret name> --docker-server=<registry-url> --docker-username=<username> --docker-password=<password> --docker-email=<email>
+```
+
 
 ****************
 
