@@ -1752,6 +1752,33 @@ To grant permissions across a whole cluster, you can use a ClusterRoleBinding. T
 kubectl create secret docker-registry <secret name> --docker-server=<registry-url> --docker-username=<username> --docker-password=<password> --docker-email=<email>
 ```
 
+### Container security
+
+> https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: teste
+  name: teste
+spec:
+  containers:
+  - image: nginx
+    name: teste
+    securityContext:
+      runAsUser: 0 # root
+      capabilities:
+        add: ["SYS_TIME"]
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+```
+
+
 
 ****************
 
