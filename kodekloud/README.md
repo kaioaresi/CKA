@@ -1778,6 +1778,66 @@ spec:
 status: {}
 ```
 
+#### Network
+
+> https://kubernetes.io/docs/concepts/services-networking/network-policies/
+
+
+
+**Note**
+
+Solutions that support network policies:
+
+- kube-router
+- Calico
+- Romana
+- Weave-net
+
+Solutions that DO NOT support network policies:
+
+- Flannel
+
+
+// TODO: learning more about network policies
+
+```
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: internal-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      name: internal
+  policyTypes:
+  - Egress
+  - Ingress
+  ingress:
+    - {}
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          name: mysql
+    ports:
+    - protocol: TCP
+      port: 3306
+
+  - to:
+    - podSelector:
+        matchLabels:
+          name: payroll
+    ports:
+    - protocol: TCP
+      port: 8080
+
+  - ports:
+    - port: 53
+      protocol: UDP
+    - port: 53
+      protocol: TCP
+```
 
 
 ****************
