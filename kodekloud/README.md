@@ -1800,44 +1800,61 @@ Solutions that DO NOT support network policies:
 
 // TODO: learning more about network policies
 
+##### Setup minikube to network policies
+
+__Calico__
+
+```
+minikube start --network-plugin=cni --enable-default-cni
+kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+```
+
+__Lab policies__
+
+Deployment nginx
+
+```
+kubectl create deployment nginx --image nginx
+kubectl expose deployment nginx --name svc-nginx --port 80
+```
+
+Validate connection
+
+```
+kubectl run -ti --rm busybox --image busybox
+
+wget --spider --timeout=1 svc-nginx
+```
+
+Apply the policies
+
+Allow only labels `access=true`
+
 ```
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: internal-policy
+  name: access-nginx
   namespace: default
 spec:
   podSelector:
     matchLabels:
-      name: internal
+      app: nginx # label onde a policy será aplicada
+  ingress: # definindo regra ingress (entrada)
+  - from: # de qual local
+    - podSelector:
+        matchLabels:
+          app: frontend # aceita apenas request de app com essa label
+    - namespaceSelector:
+        matchLabels:
+          ns: frontend # aceita request de outros namespace com esse label
+    ports:
+      - protocol: TCP
+        port: 80
   policyTypes:
-  - Egress
-  - Ingress
-  ingress:
-    - {}
-  egress:
-  - to:
-    - podSelector:
-        matchLabels:
-          name: mysql
-    ports:
-    - protocol: TCP
-      port: 3306
-
-  - to:
-    - podSelector:
-        matchLabels:
-          name: payroll
-    ports:
-    - protocol: TCP
-      port: 8080
-
-  - ports:
-    - port: 53
-      protocol: UDP
-    - port: 53
-      protocol: TCP
+    - Ingress
 ```
+
 
 
 ****************
