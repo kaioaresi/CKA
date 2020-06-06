@@ -1828,34 +1828,179 @@ wget --spider --timeout=1 svc-nginx
 
 Apply the policies
 
-Allow only labels `access=true`
+
+__Deny all__
 
 ```
-apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
 metadata:
-  name: access-nginx
+  name: deny-access-nginx
+spec:
+  podSelector:
+    matchLabels:
+      app: nginx
+  ingress: []
+```
+
+__Allow only label__
+
+Only apps with this label `role=frontend` can make request to this app.
+
+```
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: policy-frontend
+spec:
+  podSelector:
+    matchLabels:
+      app: nginx
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            role: frontend
+```
+
+Add label on namespace, every on this namespace `role=frontend` can make request to the app or app with the label `role=frontend`
+
+```
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: policy-frontend
+spec:
+  podSelector:
+    matchLabels:
+      app: nginx
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            role: frontend
+      - namespaceSelector:
+          matchLabels:
+            role: frontend
+```
+
+__Allow all traffic__
+
+```
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: policy-frontend-allow-all
+spec:
+  podSelector:
+    matchLabels:
+      app: nginx
+  policyTypes:
+    - Ingress
+  ingress: []
+```
+
+__Deny all traffic__
+
+```
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: policy-frontend-deny-all
+spec:
+  podSelector: {}
+  ingress: []
+```
+
+__Deny all traffic others namespaces__
+
+```
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: policy-frontend-deny-other-ns
   namespace: default
 spec:
   podSelector:
     matchLabels:
-      app: nginx # label onde a policy será aplicada
-  ingress: # definindo regra ingress (entrada)
-  - from: # de qual local
-    - podSelector:
-        matchLabels:
-          app: frontend # aceita apenas request de app com essa label
-    - namespaceSelector:
-        matchLabels:
-          ns: frontend # aceita request de outros namespace com esse label
-    ports:
-      - protocol: TCP
-        port: 80
-  policyTypes:
-    - Ingress
+  ingress:
+  - from:
+    - podSelector: {}
 ```
 
+Note a few things about this manifest:
 
+- namespace: `default` deploys it to the `default` namespace.
+- it applies the policy to ALL pods in `default` namespace as the spec.podSelector.matchLabels is empty and therefore selects all pods.
+- it allows traffic from ALL pods in the `default` namespace, as spec.ingress.from.podSelector is empty and therefore selects all pods.
+
+__Traffic only by port__
+
+```
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: policy-frontend-port
+spec:
+  podSelector:
+    matchLabels:
+      app: nginx
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            role: frontend
+      ports:
+        - port: 80
+```
+
+__Traffic multiple selectors__
+
+```
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: policy-frontend-mult-selectors
+spec:
+  podSelector:
+    matchLabels:
+      app: nginx
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            role: frontend
+      - podSelector:
+          matchLabels:
+            role: teste
+```
+
+__Traffic multiple selectors and ports__
+
+```
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: policy-frontend-mult-selectors-ports
+spec:
+  podSelector:
+    matchLabels:
+      app: nginx
+  policyTypes:
+    - Ingress
+  ingress:
+    - from: []
+      ports:
+        - port: 80
+```
 
 ****************
 
@@ -1874,3 +2019,10 @@ minukube addons enable metrics-server
 ## Kubernetes the hard way
 
 > https://github.com/mmumshad/kubernetes-the-hard-way
+
+---------
+
+# Reference
+
+- https://github.com/ahmetb/kubernetes-network-policy-recipes
+- https://docs.projectcalico.org/reference/resources/networkpolicy
