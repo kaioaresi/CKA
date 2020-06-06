@@ -1808,7 +1808,6 @@ __Calico__
 minikube start --network-plugin=cni --enable-default-cni
 kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
 ```
-
 __Lab policies__
 
 Deployment nginx

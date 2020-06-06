@@ -1,0 +1,35 @@
+apiVersion: v1
+master $ cat deploy-mysql.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: drupal-mysql
+  name: drupal-mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drupal-mysql
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: drupal-mysql
+    spec:
+      containers:
+      - image: mysql:5.7
+        name: mysql
+        envFrom:
+        - secretRef:
+           name: drupal-mysql-secret
+        volumeMounts:
+        - mountPath: "/var/lib/mysql"
+          subPath: "dbdata"
+          name: mysql-data
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+           claimName: drupal-mysql-pvc
