@@ -1,35 +1,50 @@
-apiVersion: v1
-master $ cat deploy-mysql.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
+  creationTimestamp: 2020-06-08T10:35:02Z
+  generation: 1
   labels:
     app: drupal-mysql
   name: drupal-mysql
+  namespace: default
 spec:
   replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: drupal-mysql
-  strategy: {}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
   template:
     metadata:
       creationTimestamp: null
       labels:
         app: drupal-mysql
     spec:
+      volumes:
+      - name: mysql-data
+        persistentVolumeClaim:
+          claimName: drupal-mysql-pvc
       containers:
       - image: mysql:5.7
+        imagePullPolicy: IfNotPresent
         name: mysql
         envFrom:
         - secretRef:
-           name: drupal-mysql-secret
+            name: drupal-mysql-secret
         volumeMounts:
-        - mountPath: "/var/lib/mysql"
+        - name: 'mysql-data'
+          mountPath: "/var/lib/mysql"
           subPath: "dbdata"
-          name: mysql-data
-      volumes:
-        - name: mysql-data
-          persistentVolumeClaim:
-           claimName: drupal-mysql-pvc
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status: {}
