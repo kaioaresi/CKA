@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2020-06-09T10:19:45Z"
+  labels:
+    app: drupal
+  managedFields:
+  - apiVersion: v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:labels:
+          .: {}
+          f:app: {}
+      f:spec:
+        f:externalTrafficPolicy: {}
+        f:ports:
+          .: {}
+          k:{"port":80,"protocol":"TCP"}:
+            .: {}
+            f:port: {}
+            f:protocol: {}
+            f:targetPort: {}
+        f:selector:
+          .: {}
+          f:app: {}
+        f:sessionAffinity: {}
+        f:type: {}
+    manager: kubectl
+    operation: Update
+    time: "2020-06-09T10:19:45Z"
+  name: svc-drupal
+  namespace: default
+  resourceVersion: "29287"
+  selfLink: /api/v1/namespaces/default/services/svc-drupal
+  uid: 2f1a9c40-77e3-43d0-9350-02e3b98c3a36
+spec:
+  clusterIP: 10.110.182.140
+  externalTrafficPolicy: Cluster
+  ports:
+  - nodePort: 30131
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: drupal
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}

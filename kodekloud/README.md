@@ -2001,6 +2001,20 @@ spec:
         - port: 80
 ```
 
+---
+
+## Storage - `7%`
+
+### Storage driver
+
+- AUFS
+- ZFS
+- BTRFS
+- Device mapper
+- Overlay
+- Overlay2
+
+
 ****************
 
 ## Minikube

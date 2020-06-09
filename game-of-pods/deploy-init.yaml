@@ -1,10 +1,18 @@
 apiVersion: apps/v1
-kind: Deploymentmetadata:
-  labels:    app: drupal
-  name: drupal  namespace: default
-spec:  replicas: 1
-  selector:    matchLabels:
-      app: drupal  strategy:    rollingUpdate:      maxSurge: 25%
+kind: Deployment
+metadata:
+  labels:
+    app: drupal
+  name: drupal
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drupal
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
       maxUnavailable: 25%
     type: RollingUpdate
   template:
@@ -17,14 +25,18 @@ spec:  replicas: 1
       - name: init-sites-volume
         persistentVolumeClaim:
           claimName: drupal-pvc
-#      - name: sites
-#        persistentVolumeClaim:
-#          claimName: drupal-pvc
       - name: modules
-        emptyDir: {}
-#      - name: themes
-#        persistentVolumeClaim:
-#          claimName: drupal-pvc
+        persistentVolumeClaim:
+          claimName: drupal-pvc
+      - name: profiles
+        persistentVolumeClaim:
+          claimName: drupal-pvc
+      - name: themes
+        persistentVolumeClaim:
+          claimName: drupal-pvc
+      - name: sites
+        persistentVolumeClaim:
+          claimName: drupal-pvc
       initContainers:
       - name: init-sites-volume
         image: drupal:8.6
@@ -33,22 +45,27 @@ spec:  replicas: 1
         volumeMounts:
         - name: init-sites-volume
           mountPath: " /data"
+#          readOnly: true
       containers:
       - image: drupal:8.6
         imagePullPolicy: IfNotPresent
         name: drupal
         volumeMounts:
         - name: 'modules'
-          mountPath: "/var/www/html/modules"
+          mountPath: "/var/www/html/"
           subPath: "modules"
-#        - name: 'profiles'
-#          mountPath: "/var/www/html/profiles"
-#          subPath: "profiles"
-#        - name: 'sites'
-#          mountPath: "/var/www/html/sites"
-#          subPath: "sites"
-#        - name: 'themes'
-#          mountPath: "/var/www/html/themes"
-#          subPath: "themes"
+#          readOnly: true
+        - name: 'profiles'
+          mountPath: "/var/www/html/profiles"
+          subPath: "profiles"
+#          readOnly: true
+        - name: 'sites'
+          mountPath: "/var/www/html/sites"
+          subPath: "sites"
+          readOnly: false
+        - name: 'themes'
+          mountPath: "/var/www/html/themes"
+          subPath: "themes"
+#          readOnly: true
       restartPolicy: Always
 status: {}
