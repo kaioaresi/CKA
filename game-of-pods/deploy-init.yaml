@@ -22,19 +22,7 @@ spec:
         app: drupal
     spec:
       volumes:
-      - name: init-sites-volume
-        persistentVolumeClaim:
-          claimName: drupal-pvc
-      - name: modules
-        persistentVolumeClaim:
-          claimName: drupal-pvc
-      - name: profiles
-        persistentVolumeClaim:
-          claimName: drupal-pvc
-      - name: themes
-        persistentVolumeClaim:
-          claimName: drupal-pvc
-      - name: sites
+      - name: drupal-data
         persistentVolumeClaim:
           claimName: drupal-pvc
       initContainers:
@@ -43,29 +31,25 @@ spec:
         command: [ "/bin/bash", "-c" ]
         args: [ 'cp -r /var/www/html/sites/ /data/; chown www-data:www-data /data/ -R' ]
         volumeMounts:
-        - name: init-sites-volume
+        - name: drupal-data
           mountPath: " /data"
-#          readOnly: true
       containers:
       - image: drupal:8.6
         imagePullPolicy: IfNotPresent
         name: drupal
         volumeMounts:
-        - name: 'modules'
+        - name: 'drupal-data'
           mountPath: "/var/www/html/"
           subPath: "modules"
-#          readOnly: true
-        - name: 'profiles'
+        - name: 'drupal-data'
           mountPath: "/var/www/html/profiles"
           subPath: "profiles"
-#          readOnly: true
-        - name: 'sites'
+        - name: 'drupal-data'
           mountPath: "/var/www/html/sites"
           subPath: "sites"
           readOnly: false
-        - name: 'themes'
+        - name: 'drupal-data'
           mountPath: "/var/www/html/themes"
           subPath: "themes"
-#          readOnly: true
       restartPolicy: Always
 status: {}
