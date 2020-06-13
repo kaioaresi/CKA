@@ -2007,6 +2007,9 @@ spec:
 
 ### Storage driver
 
+> https://docs.docker.com/storage/storagedriver/select-storage-driver/
+https://docs.docker.com/engine/extend/legacy_plugins/
+
 - AUFS
 - ZFS
 - BTRFS
@@ -2014,6 +2017,100 @@ spec:
 - Overlay
 - Overlay2
 
+### Volume drivers
+
+- Local
+- Azure File storage
+- Convoy
+- DigitalOcean block storage
+- Flocker
+- GCE-docker
+- GlusterFS
+- NetApp
+- Rexray
+- Portworx
+- VMware vShere storage
+
+## Container storage interface (CSI)
+
+> https://kubernetes.io/blog/2019/01/15/container-storage-interface-ga/
+
+![Alt cni|csi|cri](../img/cri_csi_cni.png)
+
+## Persistent volume
+
+![Alt pv and pvc](../img/pv-pvc.png)
+
+```
+apiVersion: v1
+kind: persistentvolume
+metadata:
+  name: pv-data
+  labels:
+    storage: local
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /tmp/data
+```
+
+- ReadWriteOnce -- the volume can be mounted as read-write by a single node
+- ReadOnlyMany -- the volume can be mounted read-only by many nodes
+- ReadWriteMany -- the volume can be mounted as read-write by many nodes
+
+**Important!** A volume can only be mounted using one access mode at a time, even if it supports many. For example, a GCEPersistentDisk can be mounted as ReadWriteOnce by a single node or ReadOnlyMany by many nodes, but not at the same time.
+
+
+__Reclaim Policy__
+
+Current reclaim policies are:
+
+- Retain -- manual reclamation
+- Recycle -- basic scrub '(rm -rf /thevolume/*)'
+- Delete -- associated storage asset such as AWS EBS, GCE PD, Azure Disk, or OpenStack Cinder volume is deleted
+
+## Persistent volume claims
+
+```
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 8Gi
+  storageClassName: slow
+  selector:
+    matchLabels:
+      release: "stable"
+```
+
+__POD__
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: myfrontend
+      image: nginx
+      volumeMounts:
+      - mountPath: "/var/www/html"
+        name: mypd
+  volumes:
+    - name: mypd
+      persistentVolumeClaim:
+        claimName: myclaim
+```
 
 ****************
 
