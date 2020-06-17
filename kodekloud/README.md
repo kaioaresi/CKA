@@ -2164,8 +2164,46 @@ And then we configure CoreDNS to use that file. CoreDNS loads it’s configurati
 
 CoreDNS also supports other ways of configuring DNS entries through plugins. We will look at the plugin that it uses for Kubernetes in a later section.
 
+__Networking namespaces__
 
+![Alt networking ns](../img/networking-ns.png)
 
+__Docker networking__
+
+![Alt Docker networking](../img/docker-networking.png)
+
+__Container network interface (CNI)__
+
+![Alt cni](../img/cni_tecnologies.png)
+
+**IMPORTANT:** Docker doesn't use CNI, they have your on network solution `Container network model` (CNM), to use docker in kubernetes they add docker network as `node`
+
+![Alt k8s cni cocker](../img/k8s_cni_docker.png)
+
+### Networking cluster nodes
+
+> https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+
+__Check required ports__
+
+Control-plane node
+
+Protocol | Direction | Port Range |	Purpose |	Used By
+:---:|:---:|:---:|:---:|:---:
+TPC | Inbound | 6443* | Kubernetes API server | All
+TPC | Inbound | 2379-2380	| etcd server client API | kube-apiserver, etcd
+TCP |	Inbound |	10250	| Kubelet API |	Self, Control plane
+TCP	| Inbound |	10251 |	kube-scheduler |	Self
+TCP	| Inbound	| 10252	| kube-controller-manager	| Self
+
+Worker node(s)
+
+Protocol | Direction | Port Range |	Purpose |	Used By
+:---:|:---:|:---:|:---:|:---:
+TCP |	Inbound |	10250 |	Kubelet API	| Self, Control plane
+TCP	| Inbound	| 30000-32767 |	NodePort Services† |	All
+
+**Tips:** That's because 2379 is the port of ETCD to which all control plane components connect to. 2380 is only for etcd peer-to-peer connectivity. When you have multiple master nodes. In this case we don't.
 
 ****************
 
