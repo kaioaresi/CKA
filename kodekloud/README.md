@@ -2205,6 +2205,19 @@ TCP	| Inbound	| 30000-32767 |	NodePort Services† |	All
 
 **Tips:** That's because 2379 is the port of ETCD to which all control plane components connect to. 2380 is only for etcd peer-to-peer connectivity. When you have multiple master nodes. In this case we don't.
 
+### Pod networking
+
+![Alt networking model](../img/networking_model.png)
+
+![Alt cni](../img/cni.png)
+
+### Service networking
+
+![Alt service](../img/service_networking.png)
+
+![Alt service works](../img/service_works.png)
+
+
 ****************
 
 ## Minikube
