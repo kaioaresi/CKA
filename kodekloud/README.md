@@ -2299,6 +2299,24 @@ spec:
         path: /something(/|$)(.*)
 ```
 
+---
+
+# Installation, Configuration & Validation - `12%`
+
+
+## Choosing a Network Solution
+
+Depending on your environment & network ecosystem you have a wide variety of networking options to choose from. A list of supported network solutions and their implementation details are available here:
+
+> https://kubernetes.io/docs/concepts/cluster-administration/networking/#how-to-implement-the-kubernetes-networking-model
+
+While choosing a network solution consider it's support for Network Policies.
+
+We chose to go with Weave as our networking solution due to its simplicity and support for Network Policies.
+
+> https://www.objectif-libre.com/en/blog/2018/07/05/k8s-network-solutions-comparison/
+
+
 ****************
 
 ## Minikube
