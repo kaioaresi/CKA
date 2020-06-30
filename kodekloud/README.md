@@ -2316,6 +2316,9 @@ We chose to go with Weave as our networking solution due to its simplicity and s
 
 > https://www.objectif-libre.com/en/blog/2018/07/05/k8s-network-solutions-comparison/
 
+## Kubernetes the Hard Way" on VirtualBox
+
+![Alt the hard way](https://github.com/mmumshad/kubernetes-the-hard-way)
 
 ****************
 
