@@ -2320,6 +2320,31 @@ We chose to go with Weave as our networking solution due to its simplicity and s
 
 ![Alt the hard way](https://github.com/mmumshad/kubernetes-the-hard-way)
 
+
+## kubeadm way
+
+
+### Steps
+
+> https://github.com/kodekloudhub/certified-kubernetes-administrator-course
+
+
+1 - Install container runtime (docker)
+2 - Install kubeadm
+3 - Install kubelet
+4 - Inicialize the master
+5 - Install the cni
+6 - Join the nodes
+
+
+
+
+
+```
+
+```
+
+
 ****************
 
 ## Minikube
